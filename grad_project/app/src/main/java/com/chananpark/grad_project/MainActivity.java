@@ -66,6 +66,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
     }
 
+    
+    
+    // APP 동작을 위한 부분
     @Override
     public void onStart()
     {
