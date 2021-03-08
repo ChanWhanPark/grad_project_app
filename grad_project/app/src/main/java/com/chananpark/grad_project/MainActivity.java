@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.chananpark.grad_project.Model.Point;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.LocationTrackingMode;
@@ -58,6 +60,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // 네이버 경로 저장 변수
     private List<LatLng> mPathList = new ArrayList<>();
 
+    // 목적지 & 현위치 좌표 변수
+    private double goal_x;
+    private double goal_y;
+    private Point currentPoint;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -77,10 +84,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             {
                 setMarker(marker_Gate, 37.3393, 126.7327, R.drawable.ic_twotone_room_24, 0);
 
+                goal_x = 37.3393;
+                goal_y = 126.7327;
+
                 marker_Gate.setOnClickListener(new Overlay.OnClickListener() {
                     @Override
                     public boolean onClick(@NonNull Overlay overlay)
                     {
+                        new Thread(){
+                            public void run(){
+                                try {
+                                    HttpConnection(goal_x, goal_y);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (CloneNotSupportedException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }.start();
                         Toast.makeText(getApplication(), "현위치 입니다", Toast.LENGTH_SHORT).show();
                         return false;
                     }
@@ -164,6 +187,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         naverMap.setCameraPosition(cameraPosition);
         naverMap.setLocationSource(locationSource);
         naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
+
+        naverMap.addOnLocationChangeListener(new NaverMap.OnLocationChangeListener() {
+            @Override
+            public void onLocationChange(@NonNull Location location) {
+                currentPoint = new Point();
+                currentPoint.x = location.getLatitude();
+                currentPoint.y = location.getLongitude();
+                naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
+            }
+        });
     }
 
     
@@ -219,10 +252,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     // ================ Direction 5 API ==================
-    protected void HttpConnection() throws IOException, CloneNotSupportedException, JSONException
+    protected void HttpConnection(double x, double y) throws IOException, CloneNotSupportedException, JSONException
     {
         String result = null;
-        String mURL = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving";
+        String mURL = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving" +
+                "?start=" + this.currentPoint.y + "," + this.currentPoint.x +
+                "&goal=" + goal_y + "," + goal_x;
         URL url = new URL(mURL);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
@@ -243,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set the result
         conn.disconnect();
         result = builder.toString();
+        Log.d(TAG, result.toString());
 
         // save in json
         JSONObject root = new JSONObject(result);
@@ -261,7 +297,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             JSONArray pathIndex = (JSONArray) path.get(i);
             mPathList.add(new LatLng(pathIndex.getDouble(1), pathIndex.getDouble(0)));
         }
-
-        System.out.println(mPathList);
+        Log.d(TAG, mPathList.toString());
     }
 }
