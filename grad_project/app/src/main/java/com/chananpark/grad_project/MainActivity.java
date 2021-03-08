@@ -118,18 +118,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             {
                 setMarker(marker_TIP, 37.3414, 126.7319, R.drawable.ic_baseline_pin_drop_1, 0);
 
+                goal_x = 37.3414;
+                goal_y = 126.7319;
+
                 marker_TIP.setOnClickListener(new Overlay.OnClickListener() {
                     @Override
                     public boolean onClick(@NonNull Overlay overlay)
                     {
+                        new Thread(){
+                            public void run(){
+                                try {
+                                    HttpConnection(goal_x, goal_y);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (CloneNotSupportedException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }.start();
                         Toast.makeText(getApplication(), "TIP으로 안내합니다", Toast.LENGTH_SHORT).show();
                         return false;
                     }
                 });
             }
         });
-
-
 
         // 네이버 지도
         mapView = (MapView)findViewById(R.id.map_view);
