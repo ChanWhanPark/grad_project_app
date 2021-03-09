@@ -14,13 +14,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btnmark_G"
-            android:text="현위치"/>
+            android:text="정문"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btnmark_T"
             android:text="TIP생활관"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnmark_Q"
+            android:text="산학융합관"/>
     </LinearLayout>
 
     <com.naver.maps.map.MapView

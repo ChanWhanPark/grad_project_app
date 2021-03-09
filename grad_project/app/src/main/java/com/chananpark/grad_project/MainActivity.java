@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // 마커 변수 선언 및 초기화
     private Marker marker_Gate = new Marker();
     private Marker marker_TIP = new Marker();
+    private Marker marker_QWL = new Marker();
 
     // 네이버 경로 저장 변수
     private List<LatLng> mPathList = new ArrayList<>();
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // 버튼
         Button btnMark_G = (Button) findViewById(R.id.btnmark_G);
         Button btnMark_T = (Button) findViewById(R.id.btnmark_T);
+        Button btnMark_Q = (Button) findViewById(R.id.btnmark_Q);
 
 
         btnMark_G.setOnClickListener(new Button.OnClickListener()
@@ -139,6 +141,40 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             }
                         }.start();
                         Toast.makeText(getApplication(), "TIP으로 안내합니다", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                });
+            }
+        });
+
+        btnMark_Q.setOnClickListener(new Button.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                setMarker(marker_QWL, 37.3389, 126.734328, R.drawable.ic_baseline_pin_drop_2, 0);
+
+                goal_x = 37.3389;
+                goal_y = 126.734328;
+
+                marker_QWL.setOnClickListener(new Overlay.OnClickListener() {
+                    @Override
+                    public boolean onClick(@NonNull Overlay overlay)
+                    {
+                        new Thread(){
+                            public void run(){
+                                try {
+                                    HttpConnection(goal_x, goal_y);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (CloneNotSupportedException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }.start();
+                        Toast.makeText(getApplication(), "산학융합관으로 안내합니다", Toast.LENGTH_SHORT).show();
                         return false;
                     }
                 });
@@ -301,16 +337,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         JSONObject summary = traoptimal.getJSONObject("summary");
         JSONArray path = traoptimal.getJSONArray("path");
 
+
         int naverDistance = summary.getInt("distance");
-        String naverDeparutreTime = summary.getString("deparetureTIme");
+        String naverDeparutreTime = summary.getString("departureTime");
         int naverTollFare = summary.getInt("tollFare");
         int naverTaxiFare = summary.getInt("taxiFare");
         int naverFuelPrice  = summary.getInt("fuelPrice");
 
+
         for (int i=0;i<path.length();i++){
             JSONArray pathIndex = (JSONArray) path.get(i);
             mPathList.add(new LatLng(pathIndex.getDouble(1), pathIndex.getDouble(0)));
+
         }
         Log.d(TAG, mPathList.toString());
+
+
     }
 }
