@@ -7,7 +7,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.chananpark.grad_project"
+        applicationId "com.chananpark.Tagoga_Siheung"
         minSdkVersion 16
         targetSdkVersion 30
         versionCode 1

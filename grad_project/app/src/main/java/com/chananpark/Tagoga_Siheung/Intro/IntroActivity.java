@@ -1,4 +1,4 @@
-package com.chananpark.grad_project.Intro;
+package com.chananpark.Tagoga_Siheung.Intro;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,8 +6,8 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.chananpark.grad_project.MainActivity;
-import com.chananpark.grad_project.R;
+import com.chananpark.Tagoga_Siheung.MainActivity;
+import com.chananpark.Tagoga_Siheung.R;
 
 public class IntroActivity extends AppCompatActivity {
     @Override

@@ -1,4 +1,4 @@
-package com.chananpark.grad_project.Model;
+package com.chananpark.Tagoga_Siheung.Model;
 
 import java.io.Serializable;
 

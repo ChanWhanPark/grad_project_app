@@ -1,12 +1,10 @@
-package com.chananpark.grad_project;
+package com.chananpark.Tagoga_Siheung;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.chananpark.grad_project.Model.Point;
+import com.chananpark.Tagoga_Siheung.Model.Point;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.LocationTrackingMode;
@@ -25,6 +23,7 @@ import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.overlay.Overlay;
 import com.naver.maps.map.overlay.OverlayImage;
+import com.naver.maps.map.overlay.PathOverlay;
 import com.naver.maps.map.util.FusedLocationSource;
 
 import org.json.JSONArray;
@@ -59,12 +58,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Marker marker_QWL = new Marker();
 
     // 네이버 경로 저장 변수
-    private List<LatLng> mPathList = new ArrayList<>();
+    public List<LatLng> mPathList = new ArrayList<>();
+
 
     // 목적지 & 현위치 좌표 변수
     private double goal_x;
     private double goal_y;
     private Point currentPoint;
+
+    // 경로선 표시
+    PathOverlay path_draw = new PathOverlay();
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -106,10 +110,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 }
                             }
                         }.start();
-                        Toast.makeText(getApplication(), "현위치 입니다", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplication(), "정문으로 안내합니다", Toast.LENGTH_SHORT).show();
                         return false;
                     }
                 });
+                System.out.println("쓰레드 이후 길이 출력");
+                Log.d(TAG, String.valueOf(mPathList.size()));
+                if (mPathList.size() != 0)
+                    PathDraw(mPathList);
+                mPathList.clear();
             }
         });
 
@@ -140,10 +149,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 }
                             }
                         }.start();
+
+
                         Toast.makeText(getApplication(), "TIP으로 안내합니다", Toast.LENGTH_SHORT).show();
                         return false;
                     }
                 });
+                System.out.println("쓰레드 이후 길이 출력");
+                Log.d(TAG, String.valueOf(mPathList.size()));
+                if (mPathList.size() != 0)
+                    PathDraw(mPathList);
+                mPathList.clear();
             }
         });
 
@@ -178,6 +194,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         return false;
                     }
                 });
+                System.out.println("쓰레드 이후 길이 출력");
+                Log.d(TAG, String.valueOf(mPathList.size()));
+                if (mPathList.size() != 0)
+                    PathDraw(mPathList);
+                mPathList.clear();
             }
         });
 
@@ -302,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
     // ================ Direction 5 API ==================
-    protected void HttpConnection(double x, double y) throws IOException, CloneNotSupportedException, JSONException
+    public void HttpConnection(double x, double y) throws IOException, CloneNotSupportedException, JSONException
     {
         String result = null;
         String mURL = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving" +
@@ -344,14 +365,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         int naverTaxiFare = summary.getInt("taxiFare");
         int naverFuelPrice  = summary.getInt("fuelPrice");
 
-
-        for (int i=0;i<path.length();i++){
+        for (int i=0;i<path.length();i++) {
             JSONArray pathIndex = (JSONArray) path.get(i);
             mPathList.add(new LatLng(pathIndex.getDouble(1), pathIndex.getDouble(0)));
-
         }
+        System.out.println("HTTP 함수에서 길이 출력");
         Log.d(TAG, mPathList.toString());
-
+        
+        //path_draw.setCoords(mPathList);
+        //path_draw.setColor(Color.RED);
+        //path_draw.setMap(naverMap);
 
     }
+
+    public void PathDraw(List<LatLng> pathList){
+        path_draw.setCoords(pathList);
+        path_draw.setColor(Color.RED);
+        path_draw.setMap(naverMap);
+    }
+
 }

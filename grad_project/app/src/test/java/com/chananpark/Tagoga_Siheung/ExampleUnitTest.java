@@ -1,4 +1,4 @@
-package com.chananpark.grad_project;
+package com.chananpark.Tagoga_Siheung;
 
 import org.junit.Test;
 
