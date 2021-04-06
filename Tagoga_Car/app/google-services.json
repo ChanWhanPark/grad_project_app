@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "917559067154",
+    "firebase_url": "https://chanwhan-37aa7.firebaseio.com",
+    "project_id": "chanwhan-37aa7",
+    "storage_bucket": "chanwhan-37aa7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:917559067154:android:fe7c8822b9308eb5d40ecb",
+        "android_client_info": {
+          "package_name": "com.chananpark.tagoga_car"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "917559067154-foo131epg3739ncma444t8bgmg909kek.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWkh7qqUThfPx9XMAtWHwImaS_b4heJmA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "917559067154-c3t7t2dhgu8mui2v9h53qe6l0f9h0j17.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

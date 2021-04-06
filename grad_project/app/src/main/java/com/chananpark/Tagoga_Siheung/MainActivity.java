@@ -372,9 +372,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         System.out.println("HTTP 함수에서 길이 출력");
         Log.d(TAG, mPathList.toString());
         
-        //path_draw.setCoords(mPathList);
-        //path_draw.setColor(Color.RED);
-        //path_draw.setMap(naverMap);
+        // path_draw.setCoords(mPathList);
+        // path_draw.setColor(Color.RED);
+        // path_draw.setMap(naverMap);
 
     }
 
