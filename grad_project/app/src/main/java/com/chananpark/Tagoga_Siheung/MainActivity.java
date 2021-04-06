@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.chananpark.Tagoga_Siheung.Model.Point;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.LocationTrackingMode;
@@ -69,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     // 경로선 표시
     PathOverlay path_draw = new PathOverlay();
 
+    // FireBase Information
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference databaseReference = firebaseDatabase.getReference();
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -211,6 +216,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
     }
+    // 차 위치 받아오기
+    private void getCarLocation()
+    {
+
+    }
+
     // 마커 설정
     private void setMarker(Marker marker,  double lat, double lng, int resourceID, int zIndex)
     {
