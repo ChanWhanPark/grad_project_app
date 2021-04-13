@@ -7,12 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -48,7 +47,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String msg_y;
 
     private Button sendbt;
-    private EditText editdt;
 
     public String msg;
 
@@ -57,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     List<Object> Array = new ArrayList<Object>();
 
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference databaseReference = firebaseDatabase.getReference();
+    private DatabaseReference dbref_x = firebaseDatabase.getReference().child("location").child("x");
+    private DatabaseReference dbref_y = firebaseDatabase.getReference().child("location").child("y");
     private ChildEventListener mChild;
 
     @RequiresApi(api= Build.VERSION_CODES.M)
@@ -67,16 +66,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         sendbt = (Button)findViewById(R.id.button);
-        editdt = (EditText)findViewById(R.id.editText);
-
-        initDatabase();
-
-        sendbt.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v){
-                msg = editdt.getText().toString();
-                databaseReference.child("message").push().setValue(msg);
-            }
-        });
 
         mapView = (MapView)findViewById(R.id.map_view);
         mapView.onCreate(savedInstance);
@@ -84,37 +73,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
-    }
-
-    private void initDatabase() {
-        databaseReference.child("log").setValue("check");
-        mChild = new ChildEventListener() {
-
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        databaseReference.addChildEventListener(mChild);
     }
 
 
@@ -148,18 +106,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         naverMap.setLocationSource(locationSource);
         naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
 
-        naverMap.addOnLocationChangeListener(new NaverMap.OnLocationChangeListener() {
-            @Override
-            public void onLocationChange(@NonNull Location location) {
-                currentPoint = new Point();
-                currentPoint.x = location.getLatitude();
-                currentPoint.y = location.getLongitude();
-                naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
-                msg_x = String.valueOf(currentPoint.x);
-                msg_y = String.valueOf(currentPoint.y);
-                databaseReference.child("message").push().setValue(msg_x);
-                databaseReference.child("message").push().setValue(msg_y);
+        sendbt.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                naverMap.addOnLocationChangeListener(new NaverMap.OnLocationChangeListener() {
+                    @Override
+                    public void onLocationChange(@NonNull Location location) {
+                        currentPoint = new Point();
+                        currentPoint.x = location.getLatitude();
+                        currentPoint.y = location.getLongitude();
+                        naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
 
+                        msg_x = String.valueOf(currentPoint.x);
+                        msg_y = String.valueOf(currentPoint.y);
+                        dbref_x.setValue(msg_x);
+                        dbref_y.setValue(msg_y);
+
+                    }
+                });
+                Toast.makeText(getApplication(), "Location Sending..", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -199,7 +163,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
-        databaseReference.removeEventListener(mChild);
     }
 
     @Override
