@@ -29,6 +29,12 @@
             android:text="산학융합관"/>
     </LinearLayout>
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_receive"
+        android:text="RECEIVE LOCATION" />
+
     <com.naver.maps.map.MapView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

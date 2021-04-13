@@ -1,6 +1,7 @@
 package com.chananpark.Tagoga_Siheung;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,8 +15,12 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.chananpark.Tagoga_Siheung.Model.Point;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.LocationTrackingMode;
@@ -40,6 +45,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static String TAG = "MainActivity";
@@ -58,9 +64,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Marker marker_Gate = new Marker();
     private Marker marker_TIP = new Marker();
     private Marker marker_QWL = new Marker();
+    private Marker marker_car = new Marker();
 
     // 네이버 경로 저장 변수
     public List<LatLng> mPathList = new ArrayList<>();
+    public List mGuideList = new ArrayList<>();
 
 
     // 목적지 & 현위치 좌표 변수
@@ -73,7 +81,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     // FireBase Information
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference databaseReference = firebaseDatabase.getReference();
+    private DatabaseReference dbref_x = firebaseDatabase.getReference().child("location").child("x");
+    private DatabaseReference dbref_y = firebaseDatabase.getReference().child("location").child("y");
+    private DatabaseReference dbref_path = firebaseDatabase.getReference().child("path");
+    private DatabaseReference dbref_direction = firebaseDatabase.getReference().child("direction");
+
+    // 차 위치 표시
+    private String car_location_x;
+    private String car_location_y;
+    private double car_x;
+    private double car_y;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -86,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Button btnMark_G = (Button) findViewById(R.id.btnmark_G);
         Button btnMark_T = (Button) findViewById(R.id.btnmark_T);
         Button btnMark_Q = (Button) findViewById(R.id.btnmark_Q);
+        Button btnMark_R = (Button) findViewById(R.id.btn_receive);
 
 
         btnMark_G.setOnClickListener(new Button.OnClickListener()
@@ -207,6 +225,53 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        btnMark_R.setOnClickListener(new Button.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                dbref_x.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        car_location_x = dataSnapshot.getValue(String.class);
+                        if (car_location_x == null){
+                            Log.d("TAG", " x is null");
+                        }
+                        else {
+                            car_x = Double.parseDouble(car_location_x);
+                            Log.d("TAG", car_location_x);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+                dbref_y.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        car_location_y = dataSnapshot.getValue(String.class);
+                        if (car_location_y == null){
+                            Log.d("TAG", " y is null");
+                        }
+                        else {
+                            car_y = Double.parseDouble(car_location_y);
+                            Log.d("TAG", car_location_y);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                Toast.makeText(getApplication(), "Location receive..", Toast.LENGTH_SHORT).show();
+                setcarMarker();
+            }
+
+        });
+
         // 네이버 지도
         mapView = (MapView)findViewById(R.id.map_view);
         mapView.onCreate(savedInstanceState);
@@ -216,13 +281,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
     }
-    // 차 위치 받아오기
-    private void getCarLocation()
-    {
-
+    // 마커 설정
+    private void setcarMarker(){
+        setMarker(marker_QWL, car_x, car_y, R.drawable.car_32, 0);
+        Toast.makeText(getApplication(), "Car is here~", Toast.LENGTH_SHORT).show();
+        Log.d("TAG", "Car is here~");
     }
 
-    // 마커 설정
     private void setMarker(Marker marker,  double lat, double lng, int resourceID, int zIndex)
     {
         //원근감 표시
@@ -279,9 +344,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
             }
         });
+
     }
 
-    
     
     // APP 동작을 위한 부분
     @Override
@@ -366,26 +431,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         JSONObject root = new JSONObject(result);
         JSONObject route = root.getJSONObject("route");
         JSONObject traoptimal = (JSONObject) route.getJSONArray("traoptimal").get(0);
-        JSONObject summary = traoptimal.getJSONObject("summary");
         JSONArray path = traoptimal.getJSONArray("path");
-
-
-        int naverDistance = summary.getInt("distance");
-        String naverDeparutreTime = summary.getString("departureTime");
-        int naverTollFare = summary.getInt("tollFare");
-        int naverTaxiFare = summary.getInt("taxiFare");
-        int naverFuelPrice  = summary.getInt("fuelPrice");
+        JSONArray guide = traoptimal.getJSONArray("guide");
 
         for (int i=0;i<path.length();i++) {
             JSONArray pathIndex = (JSONArray) path.get(i);
             mPathList.add(new LatLng(pathIndex.getDouble(1), pathIndex.getDouble(0)));
         }
+        dbref_path.setValue(mPathList);
         System.out.println("HTTP 함수에서 길이 출력");
         Log.d(TAG, mPathList.toString());
-        
-        // path_draw.setCoords(mPathList);
-        // path_draw.setColor(Color.RED);
-        // path_draw.setMap(naverMap);
+        Log.d(TAG, guide.toString());
 
     }
 
