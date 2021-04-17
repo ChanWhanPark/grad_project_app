@@ -64,11 +64,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Marker marker_Gate = new Marker();
     private Marker marker_TIP = new Marker();
     private Marker marker_QWL = new Marker();
-    private Marker marker_car = new Marker();
 
     // 네이버 경로 저장 변수
     public List<LatLng> mPathList = new ArrayList<>();
+    public List mPointList = new ArrayList<>();
     public List mGuideList = new ArrayList<>();
+
 
 
     // 목적지 & 현위치 좌표 변수
@@ -84,7 +85,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DatabaseReference dbref_x = firebaseDatabase.getReference().child("location").child("x");
     private DatabaseReference dbref_y = firebaseDatabase.getReference().child("location").child("y");
     private DatabaseReference dbref_path = firebaseDatabase.getReference().child("path");
-    private DatabaseReference dbref_direction = firebaseDatabase.getReference().child("direction");
+    private DatabaseReference dbref_point = firebaseDatabase.getReference().child("pointIndex");
+    private DatabaseReference dbref_direction = firebaseDatabase.getReference().child("guide");
 
     // 차 위치 표시
     private String car_location_x;
@@ -425,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Set the result
         conn.disconnect();
         result = builder.toString();
-        Log.d(TAG, result.toString());
+        Log.d(TAG, result);
 
         // save in json
         JSONObject root = new JSONObject(result);
@@ -438,11 +440,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             JSONArray pathIndex = (JSONArray) path.get(i);
             mPathList.add(new LatLng(pathIndex.getDouble(1), pathIndex.getDouble(0)));
         }
+        for (int i=0;i<guide.length();i++){
+            JSONObject guideIndex = (JSONObject) guide.get(i);
+            mPointList.add(guideIndex.get("pointIndex"));
+            mGuideList.add(guideIndex.get("type"));
+        }
         dbref_path.setValue(mPathList);
+        dbref_point.setValue(mPointList);
+        dbref_direction.setValue(mGuideList);
         System.out.println("HTTP 함수에서 길이 출력");
         Log.d(TAG, mPathList.toString());
         Log.d(TAG, guide.toString());
-
+        Log.d(TAG, mPointList.toString());
+        Log.d(TAG, mGuideList.toString());
     }
 
     public void PathDraw(List<LatLng> pathList){
