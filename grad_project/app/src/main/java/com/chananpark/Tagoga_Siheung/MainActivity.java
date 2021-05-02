@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(MainActivity.this, "TIP으로 안내합니다.", Toast.LENGTH_SHORT).show();
-                        setMarker(marker_Gate, 37.3414, 126.7319, R.drawable.ic_baseline_pin_drop_1, 0);
+                        setMarker(marker_TIP, 37.3414, 126.7319, R.drawable.ic_baseline_pin_drop_1, 0);
                         goal_x = 37.3414;
                         goal_y = 126.7319;
                         new Thread(){
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(MainActivity.this, "TIP으로 안내합니다.", Toast.LENGTH_SHORT).show();
-                        setMarker(marker_Gate, 37.3389, 126.734328, R.drawable.ic_baseline_pin_drop_2, 0);
+                        setMarker(marker_QWL, 37.3389, 126.734328, R.drawable.ic_baseline_pin_drop_2, 0);
                         goal_x = 37.3389;
                         goal_y = 126.734328;
                         new Thread(){
