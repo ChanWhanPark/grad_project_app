@@ -330,6 +330,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     Toast.makeText(MainActivity.this, "저장된 경로정보가 없습니다.", Toast.LENGTH_SHORT).show();
                 }
                 mPathList.clear();
+                mGuideList.clear();
+                mPointList.clear();
             }
         });
 
@@ -504,6 +506,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mPointList.add(guideIndex.get("pointIndex"));
             mGuideList.add(guideIndex.get("type"));
         }
+
         dbref_path.setValue(mPathList);
         dbref_point.setValue(mPointList);
         dbref_direction.setValue(mGuideList);
