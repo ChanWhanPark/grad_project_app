@@ -3,8 +3,10 @@ package com.chananpark.Tagoga_Siheung;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
@@ -87,6 +89,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DatabaseReference dbref_path = firebaseDatabase.getReference().child("path");
     private DatabaseReference dbref_point = firebaseDatabase.getReference().child("pointIndex");
     private DatabaseReference dbref_direction = firebaseDatabase.getReference().child("guide");
+    private DatabaseReference dbref_my_x = firebaseDatabase.getReference().child("my_location").child("x");
+    private DatabaseReference dbref_my_y = firebaseDatabase.getReference().child("my_location").child("y");
 
     // 차 위치 표시
     private String car_location_x;
@@ -105,7 +109,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Button btnMark_G = (Button) findViewById(R.id.btnmark_G);
         Button btnMark_T = (Button) findViewById(R.id.btnmark_T);
         Button btnMark_Q = (Button) findViewById(R.id.btnmark_Q);
-        Button btnMark_R = (Button) findViewById(R.id.btn_receive);
+        Button btnMark_F = (Button) findViewById(R.id.btnmark_F);
+        Button btn_receive = (Button) findViewById(R.id.btn_receive);
+        Button btn_call = (Button) findViewById(R.id.btn_call);
+        Button btn_path = (Button) findViewById(R.id.btn_path);
 
 
         btnMark_G.setOnClickListener(new Button.OnClickListener()
@@ -113,15 +120,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v)
             {
-                setMarker(marker_Gate, 37.3393, 126.7327, R.drawable.ic_twotone_room_24, 0);
-
-                goal_x = 37.3393;
-                goal_y = 126.7327;
-
-                marker_Gate.setOnClickListener(new Overlay.OnClickListener() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("안내");
+                builder.setMessage("정문으로 가시겠습니까?");
+                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
                     @Override
-                    public boolean onClick(@NonNull Overlay overlay)
-                    {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "정문으로 안내합니다.", Toast.LENGTH_SHORT).show();
+                        setMarker(marker_Gate, 37.3393, 126.7327, R.drawable.ic_twotone_room_24, 0);
+                        goal_x = 37.3393;
+                        goal_y = 126.7327;
                         new Thread(){
                             public void run(){
                                 try {
@@ -135,15 +143,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 }
                             }
                         }.start();
-                        Toast.makeText(getApplication(), "정문으로 안내합니다", Toast.LENGTH_SHORT).show();
-                        return false;
                     }
                 });
-                System.out.println("쓰레드 이후 길이 출력");
-                Log.d(TAG, String.valueOf(mPathList.size()));
-                if (mPathList.size() != 0)
-                    PathDraw(mPathList);
-                mPathList.clear();
+                // NO 버튼
+                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.show();
+
             }
         });
 
@@ -152,15 +162,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v)
             {
-                setMarker(marker_TIP, 37.3414, 126.7319, R.drawable.ic_baseline_pin_drop_1, 0);
-
-                goal_x = 37.3414;
-                goal_y = 126.7319;
-
-                marker_TIP.setOnClickListener(new Overlay.OnClickListener() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("안내");
+                builder.setMessage("TIP으로 가시겠습니까?");
+                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
                     @Override
-                    public boolean onClick(@NonNull Overlay overlay)
-                    {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "TIP으로 안내합니다.", Toast.LENGTH_SHORT).show();
+                        setMarker(marker_Gate, 37.3414, 126.7319, R.drawable.ic_baseline_pin_drop_1, 0);
+                        goal_x = 37.3414;
+                        goal_y = 126.7319;
                         new Thread(){
                             public void run(){
                                 try {
@@ -174,17 +185,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 }
                             }
                         }.start();
-
-
-                        Toast.makeText(getApplication(), "TIP으로 안내합니다", Toast.LENGTH_SHORT).show();
-                        return false;
                     }
                 });
-                System.out.println("쓰레드 이후 길이 출력");
-                Log.d(TAG, String.valueOf(mPathList.size()));
-                if (mPathList.size() != 0)
-                    PathDraw(mPathList);
-                mPathList.clear();
+                // NO 버튼
+                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.show();
+
             }
         });
 
@@ -193,15 +204,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onClick(View v)
             {
-                setMarker(marker_QWL, 37.3389, 126.734328, R.drawable.ic_baseline_pin_drop_2, 0);
-
-                goal_x = 37.3389;
-                goal_y = 126.734328;
-
-                marker_QWL.setOnClickListener(new Overlay.OnClickListener() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("안내");
+                builder.setMessage("산융으로 가시겠습니까?");
+                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
                     @Override
-                    public boolean onClick(@NonNull Overlay overlay)
-                    {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "TIP으로 안내합니다.", Toast.LENGTH_SHORT).show();
+                        setMarker(marker_Gate, 37.3389, 126.734328, R.drawable.ic_baseline_pin_drop_2, 0);
+                        goal_x = 37.3389;
+                        goal_y = 126.734328;
                         new Thread(){
                             public void run(){
                                 try {
@@ -215,19 +227,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                 }
                             }
                         }.start();
-                        Toast.makeText(getApplication(), "산학융합관으로 안내합니다", Toast.LENGTH_SHORT).show();
-                        return false;
                     }
                 });
-                System.out.println("쓰레드 이후 길이 출력");
-                Log.d(TAG, String.valueOf(mPathList.size()));
-                if (mPathList.size() != 0)
-                    PathDraw(mPathList);
-                mPathList.clear();
+                // NO 버튼
+                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.show();
+
             }
         });
 
-        btnMark_R.setOnClickListener(new Button.OnClickListener(){
+        btnMark_F.setOnClickListener(new Button.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        btn_receive.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v) {
 
@@ -272,6 +293,44 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 setcarMarker();
             }
 
+        });
+
+        btn_call.setOnClickListener(new Button.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                builder.setTitle("차량 호출");
+                builder.setMessage("차량을 호출하겠습니까?");
+                // OK 버튼
+                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "차량을 호출합니다.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                // NO 버튼
+                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                builder.show();
+
+            }
+        });
+
+        btn_path.setOnClickListener(new Button.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                if (mPathList.size() != 0)
+                    PathDraw(mPathList);
+                else{
+                    Toast.makeText(MainActivity.this, "저장된 경로정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+                mPathList.clear();
+            }
         });
 
         // 네이버 지도
