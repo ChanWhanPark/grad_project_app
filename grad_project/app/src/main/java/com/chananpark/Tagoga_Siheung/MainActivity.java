@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Marker marker_Gate = new Marker();
     private Marker marker_TIP = new Marker();
     private Marker marker_QWL = new Marker();
+    private Marker marker_Car = new Marker();
 
     // 네이버 경로 저장 변수
     public List<LatLng> mPathList = new ArrayList<>();
@@ -91,12 +92,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DatabaseReference dbref_direction = firebaseDatabase.getReference().child("guide");
     private DatabaseReference dbref_my_x = firebaseDatabase.getReference().child("my_location").child("x");
     private DatabaseReference dbref_my_y = firebaseDatabase.getReference().child("my_location").child("y");
+    private DatabaseReference dbref_flag = firebaseDatabase.getReference().child("flag");
 
     // 차 위치 표시
     private String car_location_x;
     private String car_location_y;
     private double car_x;
     private double car_y;
+
+    // 모드 설정
+    protected int flag = 0;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -114,7 +119,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Button btn_call = (Button) findViewById(R.id.btn_call);
         Button btn_path = (Button) findViewById(R.id.btn_path);
 
-
+        
+        // 정문으로 안내
         btnMark_G.setOnClickListener(new Button.OnClickListener()
         {
             @Override
@@ -157,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        // TIP으로 안내
         btnMark_T.setOnClickListener(new Button.OnClickListener()
         {
             @Override
@@ -199,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        // 산학융합관으로 안내
         btnMark_Q.setOnClickListener(new Button.OnClickListener()
         {
             @Override
@@ -241,6 +249,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        // 원하는 위치로 이동
         btnMark_F.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -248,6 +257,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        // 차량 위치를 받아옴
         btn_receive.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -295,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         });
 
+        // 차량 호출
         btn_call.setOnClickListener(new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -307,6 +318,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(MainActivity.this, "차량을 호출합니다.", Toast.LENGTH_SHORT).show();
+                        dbref_flag.setValue(flag);
                     }
                 });
                 // NO 버튼
@@ -321,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+        // 안내하기 위한 경로 정보 표시
         btn_path.setOnClickListener(new Button.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -346,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     // 마커 설정
     private void setcarMarker(){
-        setMarker(marker_QWL, car_x, car_y, R.drawable.car_32, 0);
+        setMarker(marker_Car, car_x, car_y, R.drawable.car_32, 0);
         Toast.makeText(getApplication(), "Car is here~", Toast.LENGTH_SHORT).show();
         Log.d("TAG", "Car is here~");
     }
@@ -404,6 +417,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 currentPoint = new Point();
                 currentPoint.x = location.getLatitude();
                 currentPoint.y = location.getLongitude();
+                dbref_my_x.setValue(currentPoint.x);
+                dbref_my_y.setValue(currentPoint.y);
                 naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
             }
         });

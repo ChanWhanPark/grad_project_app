@@ -57,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference dbref_x = firebaseDatabase.getReference().child("location").child("x");
     private DatabaseReference dbref_y = firebaseDatabase.getReference().child("location").child("y");
-    private ChildEventListener mChild;
 
     @RequiresApi(api= Build.VERSION_CODES.M)
     @Override
