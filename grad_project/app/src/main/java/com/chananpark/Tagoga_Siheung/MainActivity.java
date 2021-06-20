@@ -100,8 +100,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double car_x;
     private double car_y;
 
-    // 모드 설정
-    protected int flag = 0;
+    public int flag = 0;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -119,90 +118,105 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Button btn_call = (Button) findViewById(R.id.btn_call);
         Button btn_path = (Button) findViewById(R.id.btn_path);
 
+        // 모드 설정
+
         
         // 정문으로 안내
         btnMark_G.setOnClickListener(new Button.OnClickListener()
         {
             @Override
-            public void onClick(View v)
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("안내");
-                builder.setMessage("정문으로 가시겠습니까?");
-                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this, "정문으로 안내합니다.", Toast.LENGTH_SHORT).show();
-                        setMarker(marker_Gate, 37.3393, 126.7327, R.drawable.ic_twotone_room_24, 0);
-                        goal_x = 37.3393;
-                        goal_y = 126.7327;
-                        new Thread(){
-                            public void run(){
-                                try {
-                                    HttpConnection(goal_x, goal_y);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (CloneNotSupportedException e) {
-                                    e.printStackTrace();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+            public void onClick(View v) {
+                if (flag == 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("오류");
+                    builder.setMessage("차량이 도착하지 않았습니다.");
+                    builder.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("안내");
+                    builder.setMessage("정문으로 가시겠습니까?");
+                    builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, "정문으로 안내합니다.", Toast.LENGTH_SHORT).show();
+                            setMarker(marker_Gate, 37.3393, 126.7327, R.drawable.ic_twotone_room_24, 0);
+                            goal_x = 37.3393;
+                            goal_y = 126.7327;
+                            new Thread() {
+                                public void run() {
+                                    try {
+                                        HttpConnection(goal_x, goal_y);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (CloneNotSupportedException e) {
+                                        e.printStackTrace();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
-                        }.start();
-                    }
-                });
-                // NO 버튼
-                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                builder.show();
+                            }.start();
+                        }
+                    });
+                    // NO 버튼
+                    builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    builder.show();
 
+                }
             }
         });
 
         // TIP으로 안내
         btnMark_T.setOnClickListener(new Button.OnClickListener()
         {
-            @Override
-            public void onClick(View v)
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("안내");
-                builder.setMessage("TIP으로 가시겠습니까?");
-                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this, "TIP으로 안내합니다.", Toast.LENGTH_SHORT).show();
-                        setMarker(marker_TIP, 37.3414, 126.7319, R.drawable.ic_baseline_pin_drop_1, 0);
-                        goal_x = 37.3414;
-                        goal_y = 126.7319;
-                        new Thread(){
-                            public void run(){
-                                try {
-                                    HttpConnection(goal_x, goal_y);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (CloneNotSupportedException e) {
-                                    e.printStackTrace();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }.start();
-                    }
-                });
-                // NO 버튼
-                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                builder.show();
 
+            @Override
+            public void onClick(View v) {
+                if (flag == 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("오류");
+                    builder.setMessage("차량이 도착하지 않았습니다.");
+                    builder.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("안내");
+                    builder.setMessage("TIP으로 가시겠습니까?");
+                    builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, "TIP으로 안내합니다.", Toast.LENGTH_SHORT).show();
+                            setMarker(marker_TIP, 37.3414, 126.7319, R.drawable.ic_baseline_pin_drop_1, 0);
+                            goal_x = 37.3414;
+                            goal_y = 126.7319;
+                            new Thread() {
+                                public void run() {
+                                    try {
+                                        HttpConnection(goal_x, goal_y);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (CloneNotSupportedException e) {
+                                        e.printStackTrace();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }.start();
+                        }
+                    });
+                    // NO 버튼
+                    builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    builder.show();
+
+                }
             }
         });
 
@@ -210,42 +224,48 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         btnMark_Q.setOnClickListener(new Button.OnClickListener()
         {
             @Override
-            public void onClick(View v)
-            {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("안내");
-                builder.setMessage("산융으로 가시겠습니까?");
-                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this, "TIP으로 안내합니다.", Toast.LENGTH_SHORT).show();
-                        setMarker(marker_QWL, 37.3389, 126.734328, R.drawable.ic_baseline_pin_drop_2, 0);
-                        goal_x = 37.3389;
-                        goal_y = 126.734328;
-                        new Thread(){
-                            public void run(){
-                                try {
-                                    HttpConnection(goal_x, goal_y);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (CloneNotSupportedException e) {
-                                    e.printStackTrace();
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
+            public void onClick(View v) {
+                if (flag == 0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("오류");
+                    builder.setMessage("차량이 도착하지 않았습니다.");
+                    builder.show();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("안내");
+                    builder.setMessage("산융으로 가시겠습니까?");
+                    builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, "TIP으로 안내합니다.", Toast.LENGTH_SHORT).show();
+                            setMarker(marker_QWL, 37.3389, 126.734328, R.drawable.ic_baseline_pin_drop_2, 0);
+                            goal_x = 37.3389;
+                            goal_y = 126.734328;
+                            new Thread() {
+                                public void run() {
+                                    try {
+                                        HttpConnection(goal_x, goal_y);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (CloneNotSupportedException e) {
+                                        e.printStackTrace();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
-                            }
-                        }.start();
-                    }
-                });
-                // NO 버튼
-                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                builder.show();
+                            }.start();
+                        }
+                    });
+                    // NO 버튼
+                    builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(MainActivity.this, "취소", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    builder.show();
 
+                }
             }
         });
 
@@ -318,6 +338,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(MainActivity.this, "차량을 호출합니다.", Toast.LENGTH_SHORT).show();
+                        flag = 1;
                         dbref_flag.setValue(flag);
                     }
                 });
@@ -330,6 +351,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
                 builder.show();
 
+
+
             }
         });
 
@@ -339,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 if (mPathList.size() != 0)
                     PathDraw(mPathList);
+
                 else{
                     Toast.makeText(MainActivity.this, "저장된 경로정보가 없습니다.", Toast.LENGTH_SHORT).show();
                 }
