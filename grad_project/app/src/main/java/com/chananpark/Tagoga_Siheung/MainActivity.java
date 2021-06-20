@@ -342,9 +342,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         dbref_flag.setValue(flag);
                         /* 이 중간에 알고리즘을 추가함으로써 호출 완료 시에 다음 기능을 사용할 수 있도록 해야함 */
 
-
                         flag = 0;
                     }
+
                 });
                 // NO 버튼
                 builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
