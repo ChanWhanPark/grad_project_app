@@ -100,7 +100,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double car_x;
     private double car_y;
 
-    public int flag = 0;
+    public int flag = 1;
+    public String getflag;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             @Override
             public void onClick(View v) {
-                if (flag == 0) {
+                if (flag == 1) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setTitle("오류");
                     builder.setMessage("차량이 도착하지 않았습니다.");
@@ -176,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onClick(View v) {
-                if (flag == 0) {
+                if (flag == 1) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setTitle("오류");
                     builder.setMessage("차량이 도착하지 않았습니다.");
@@ -225,7 +226,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             @Override
             public void onClick(View v) {
-                if (flag == 0) {
+                if (flag == 1) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setTitle("오류");
                     builder.setMessage("차량이 도착하지 않았습니다.");
@@ -338,8 +339,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(MainActivity.this, "차량을 호출합니다.", Toast.LENGTH_SHORT).show();
-                        flag = 1;
                         dbref_flag.setValue(flag);
+                        /* 이 중간에 알고리즘을 추가함으로써 호출 완료 시에 다음 기능을 사용할 수 있도록 해야함 */
+
+
+                        flag = 0;
                     }
                 });
                 // NO 버튼
