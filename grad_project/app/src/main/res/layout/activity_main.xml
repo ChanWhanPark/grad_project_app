@@ -65,8 +65,35 @@
             android:layout_height="wrap_content"
             android:text="경로 확인"
             app:backgroundTint="#3F51B5" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
+        <TextView
+            android:id="@+id/my_x"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="x좌표"></TextView>
 
+        <TextView
+            android:id="@+id/my_y"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="y좌표"></TextView>
+
+        <TextView
+            android:id="@+id/my_index"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="현재 인덱스"></TextView>
+
+        <TextView
+            android:id="@+id/my_direction"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="현재 방향"></TextView>
     </LinearLayout>
 
     <com.naver.maps.map.MapView

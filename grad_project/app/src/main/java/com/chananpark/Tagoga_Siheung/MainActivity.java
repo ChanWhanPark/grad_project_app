@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.chananpark.Tagoga_Siheung.Model.Point;
@@ -38,6 +39,7 @@ import com.naver.maps.map.util.FusedLocationSource;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -73,8 +75,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public List mPointList = new ArrayList<>();
     public List mGuideList = new ArrayList<>();
 
-
-
     // 목적지 & 현위치 좌표 변수
     private double goal_x;
     private double goal_y;
@@ -89,19 +89,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DatabaseReference dbref_y = firebaseDatabase.getReference().child("location").child("y");
     private DatabaseReference dbref_path = firebaseDatabase.getReference().child("path");
     private DatabaseReference dbref_point = firebaseDatabase.getReference().child("pointIndex");
-    private DatabaseReference dbref_direction = firebaseDatabase.getReference().child("guide");
+    private DatabaseReference dbref_guide = firebaseDatabase.getReference().child("guide");
     private DatabaseReference dbref_my_x = firebaseDatabase.getReference().child("my_location").child("x");
     private DatabaseReference dbref_my_y = firebaseDatabase.getReference().child("my_location").child("y");
     private DatabaseReference dbref_flag = firebaseDatabase.getReference().child("flag");
+    private DatabaseReference dbref_arrive = firebaseDatabase.getReference().child("arrive");
+    private DatabaseReference dbref_index = firebaseDatabase.getReference().child("currentIndex");
+    private DatabaseReference dbref_guideindex = firebaseDatabase.getReference().child("currentguideIndex");
 
     // 차 위치 표시
     private String car_location_x;
     private String car_location_y;
     private double car_x;
     private double car_y;
+    private TextView x_location;
+    private TextView y_location;
+    private TextView current_index_view;
+    private TextView index_location;
 
-    public int flag = 1;
-    public String getflag;
+
+    public int flag = 0;
+    public int index = 0;
+    public int guideindex = 0;
+    public int arrive = 0;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -119,7 +129,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         Button btn_call = (Button) findViewById(R.id.btn_call);
         Button btn_path = (Button) findViewById(R.id.btn_path);
 
-        // 모드 설정
+        // 텍스트뷰
+        x_location = (TextView) findViewById(R.id.my_x);
+        y_location = (TextView) findViewById(R.id.my_y);
+        current_index_view = (TextView) findViewById(R.id.my_index);
+        index_location = (TextView) findViewById(R.id.my_direction);
+
 
         
         // 정문으로 안내
@@ -127,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             @Override
             public void onClick(View v) {
-                if (flag == 1) {
+                if (flag == 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setTitle("오류");
                     builder.setMessage("차량이 도착하지 않았습니다.");
@@ -177,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             @Override
             public void onClick(View v) {
-                if (flag == 1) {
+                if (flag == 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setTitle("오류");
                     builder.setMessage("차량이 도착하지 않았습니다.");
@@ -226,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             @Override
             public void onClick(View v) {
-                if (flag == 1) {
+                if (flag == 0) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                     builder.setTitle("오류");
                     builder.setMessage("차량이 도착하지 않았습니다.");
@@ -339,10 +354,32 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(MainActivity.this, "차량을 호출합니다.", Toast.LENGTH_SHORT).show();
-                        dbref_flag.setValue(flag);
-                        /* 이 중간에 알고리즘을 추가함으로써 호출 완료 시에 다음 기능을 사용할 수 있도록 해야함 */
 
-                        flag = 0;
+                        /* 이 중간에 알고리즘을 추가함으로써 호출 완료 시에 다음 기능을 사용할 수 있도록 해야함 */
+                        dbref_arrive.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                dbref_my_x.setValue(currentPoint.x);
+                                dbref_my_y.setValue(currentPoint.y);
+                                try {
+                                    arrive = dataSnapshot.getValue(Integer.class);
+                                }
+                                catch (NullPointerException e) {
+                                    arrive = 0;
+                                }
+                                if (arrive == 1){
+                                    Toast.makeText(MainActivity.this, "차량이 도착했습니다.", Toast.LENGTH_SHORT).show();
+                                    flag = 1;
+                                    dbref_flag.setValue(flag);
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+
+
                     }
 
                 });
@@ -445,8 +482,51 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 currentPoint = new Point();
                 currentPoint.x = location.getLatitude();
                 currentPoint.y = location.getLongitude();
-                dbref_my_x.setValue(currentPoint.x);
-                dbref_my_y.setValue(currentPoint.y);
+                x_location.setText(String.valueOf(currentPoint.x));
+                y_location.setText(String.valueOf(currentPoint.y));
+                dbref_index.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        try {
+                             index = dataSnapshot.getValue(Integer.class);
+                        }
+                        catch (NullPointerException e) {
+                            index = 0;
+                        }
+                        current_index_view.setText(String.valueOf(index));
+
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                dbref_guideindex.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        try {
+                            guideindex = dataSnapshot.getValue(Integer.class);
+                        }
+                        catch (NullPointerException e) {
+                            guideindex = 0;
+                        }
+                        if (guideindex == 1){
+                            index_location.setText("↑");
+                        }else if (guideindex == 2){
+                            index_location.setText("←");
+                        }else if (guideindex == 3){
+                            index_location.setText("→");
+                        }else if (guideindex == 88){
+                            index_location.setText("도착!");
+                        }else{
+                            index_location.setText("○");
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
                 naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
             }
         });
@@ -552,7 +632,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         dbref_path.setValue(mPathList);
         dbref_point.setValue(mPointList);
-        dbref_direction.setValue(mGuideList);
+        dbref_guide.setValue(mGuideList);
         System.out.println("HTTP 함수에서 길이 출력");
         Log.d(TAG, mPathList.toString());
         Log.d(TAG, guide.toString());
@@ -565,5 +645,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         path_draw.setColor(Color.RED);
         path_draw.setMap(naverMap);
     }
-
 }
