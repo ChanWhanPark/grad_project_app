@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
@@ -47,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String msg_y;
 
     private Button sendbt;
+    private TextView x_location;
+    private TextView y_location;
 
     public String msg;
 
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private DatabaseReference dbref_x = firebaseDatabase.getReference().child("location").child("x");
     private DatabaseReference dbref_y = firebaseDatabase.getReference().child("location").child("y");
+    private DatabaseReference dbref_flag = firebaseDatabase.getReference().child("flag");
 
     @RequiresApi(api= Build.VERSION_CODES.M)
     @Override
@@ -69,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapView = (MapView)findViewById(R.id.map_view);
         mapView.onCreate(savedInstance);
         mapView.getMapAsync(this);
+
+        x_location = (TextView)findViewById(R.id.my_x);
+        y_location = (TextView)findViewById(R.id.my_y);
 
         locationSource = new FusedLocationSource(this, LOCATION_PERMISSION_REQUEST_CODE);
 
@@ -107,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         sendbt.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
+                dbref_flag.setValue(0);
                 naverMap.addOnLocationChangeListener(new NaverMap.OnLocationChangeListener() {
                     @Override
                     public void onLocationChange(@NonNull Location location) {
@@ -117,8 +125,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                         msg_x = String.valueOf(currentPoint.x);
                         msg_y = String.valueOf(currentPoint.y);
-                        dbref_x.setValue(msg_x);
-                        dbref_y.setValue(msg_y);
+                        x_location.setText(msg_x);
+                        y_location.setText(msg_y);
+                        dbref_x.setValue(currentPoint.x);
+                        dbref_y.setValue(currentPoint.y);
+
 
                     }
                 });
