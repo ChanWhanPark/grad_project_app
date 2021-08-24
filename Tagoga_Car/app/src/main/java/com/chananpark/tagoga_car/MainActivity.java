@@ -130,7 +130,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         dbref_x.setValue(currentPoint.x);
                         dbref_y.setValue(currentPoint.y);
 
-
                     }
                 });
                 Toast.makeText(getApplication(), "Location Sending..", Toast.LENGTH_SHORT).show();

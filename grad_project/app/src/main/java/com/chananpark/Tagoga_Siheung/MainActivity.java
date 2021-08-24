@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +36,9 @@ import com.naver.maps.map.overlay.Overlay;
 import com.naver.maps.map.overlay.OverlayImage;
 import com.naver.maps.map.overlay.PathOverlay;
 import com.naver.maps.map.util.FusedLocationSource;
+import com.naver.maps.map.NaverMap.OnMapClickListener;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private DatabaseReference dbref_guideindex = firebaseDatabase.getReference().child("currentguideIndex");
 
     // 차 위치 표시
-    private String car_location_x;
-    private String car_location_y;
+    private Double car_location_x;
+    private Double car_location_y;
     private double car_x;
     private double car_y;
     private TextView x_location;
@@ -301,13 +304,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 dbref_x.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        car_location_x = dataSnapshot.getValue(String.class);
+                        car_location_x = dataSnapshot.getValue(Double.class);
                         if (car_location_x == null){
                             Log.d("TAG", " x is null");
                         }
                         else {
-                            car_x = Double.parseDouble(car_location_x);
-                            Log.d("TAG", car_location_x);
+                            car_x = car_location_x;
+                            Log.d("TAG", String.valueOf(car_location_x));
                         }
                     }
 
@@ -320,13 +323,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 dbref_y.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        car_location_y = dataSnapshot.getValue(String.class);
+                        car_location_y = dataSnapshot.getValue(Double.class);
                         if (car_location_y == null){
                             Log.d("TAG", " y is null");
                         }
                         else {
-                            car_y = Double.parseDouble(car_location_y);
-                            Log.d("TAG", car_location_y);
+                            car_y = car_location_y;
+                            Log.d("TAG", String.valueOf(car_location_y));
                         }
                     }
 
@@ -476,6 +479,34 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         naverMap.setLocationSource(locationSource);
         naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
 
+        naverMap.setOnMapLongClickListener(new NaverMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(@NonNull @NotNull PointF pointF, @NonNull @NotNull LatLng latLng) {
+
+                if (flag == 1) {
+                    goal_x = latLng.latitude;
+                    goal_y = latLng.longitude;
+                    Toast.makeText(MainActivity.this, String.valueOf(goal_x) + ", " + String.valueOf(goal_y), Toast.LENGTH_SHORT).show();
+                    new Thread() {
+                        public void run() {
+                            try {
+                                HttpConnection(goal_x, goal_y);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } catch (CloneNotSupportedException e) {
+                                e.printStackTrace();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }.start();
+                }else{
+                    Toast.makeText(MainActivity.this, "차량이 도착하지 않았습니다.", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
         naverMap.addOnLocationChangeListener(new NaverMap.OnLocationChangeListener() {
             @Override
             public void onLocationChange(@NonNull Location location) {
@@ -491,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                              index = dataSnapshot.getValue(Integer.class);
                         }
                         catch (NullPointerException e) {
-                            index = 0;
+                            index = -99;
                         }
                         current_index_view.setText(String.valueOf(index));
 
@@ -508,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             guideindex = dataSnapshot.getValue(Integer.class);
                         }
                         catch (NullPointerException e) {
-                            guideindex = 0;
+                            guideindex = -99;
                         }
                         if (guideindex == 1){
                             index_location.setText("↑");
@@ -518,7 +549,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             index_location.setText("→");
                         }else if (guideindex == 88){
                             index_location.setText("도착!");
-                        }else{
+                            Toast.makeText(MainActivity.this, "차량이 목적지에 도착했습니다.", Toast.LENGTH_SHORT).show();
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            dbref_guideindex.setValue(0);
+                            guideindex = 100;
+                        }else if (guideindex == 100){
+                            index_location.setText("도착!");
+                            flag = 0;
+                        }
+                        else{
                             index_location.setText("○");
                         }
                     }
@@ -581,6 +624,21 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    public double[] getGoalPoint(){
+        double[] goal = new double[2];
+        naverMap.setOnMapClickListener(new NaverMap.OnMapClickListener(){
+            @Override
+            public void onMapClick(@NonNull @NotNull PointF pointF, @NonNull @NotNull LatLng latLng) {
+                goal_x = latLng.latitude;
+                goal_y = latLng.longitude;
+                goal[0] = goal_x;
+                goal[1] = goal_y;
+            }
+        });
+        return goal;
+
     }
 
 
